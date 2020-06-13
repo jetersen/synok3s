@@ -5,9 +5,9 @@ Based on: https://medium.com/@marco.mezzaro/k3s-on-synology-what-if-it-works-e98
 
 ## Compile missing kernel modules
 
-download from sourceforge kernel source and dsm toolchain (my ds218 has rtd129x)
-- https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/rtd1296-source/
-- https://sourceforge.net/projects/dsgpl/files/DSM%206.2.2%20Tool%20Chains/Realtek%20RTD129x%20Linux%204.4.59/
+download from sourceforge kernel source and dsm toolchain (my DS918+ has apollolake intel cpu)
+- https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/24922branch/apollolake-source/ and download linux-4.4.x.txz
+- https://sourceforge.net/projects/dsgpl/files/DSM%206.2.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Apollolake%29/
 
 from a brand new debian system:
 create a folder:
@@ -19,7 +19,7 @@ mkdir -p ~/dsm/archives
 cd ~/dsm
 ```
 put:
-- rtd1296-gcc494_glibc220_armv8-GPL.txz
+- apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz
 - linux-4.4.x.txz
 
 install all build deps:
@@ -32,22 +32,23 @@ extract and move txz archives away:
 
 ```
 tar Jxvf linux-4.4.x.txz 
-tar Jxvf rtd1296-gcc494_glibc220_armv8-GPL.txz 
-mv linux-4.4.x.txz rtd1296-gcc494_glibc220_armv8-GPL.txz archives/
+tar Jxvf apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz 
+mv linux-4.4.x.txz apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz archives/
 ```
 
 enter in kernel source folder and copy kernel config in place
 
 ```
 cd linux-4.4.x/
-cp synoconfigs/rtd1296 .config
+cp synoconfigs/apollolake .config
 ```
 
 export magic number version (if not exported could cause headaches!) and alias for dsm make
 
+Magic number for x64 is `+`, where on arm64 it is `+1` 🤯
 ```
-export LOCALVERSION=+1
-alias dsm6make='make ARCH=arm64 CROSS_COMPILE=~/dsm/aarch64-unknown-linux-gnueabi/bin/aarch64-unknown-linux-gnueabi-'
+export LOCALVERSION=+
+alias dsm6make='make ARCH=x86_64 CROSS_COMPILE=~/dsm/x86_64-pc-linux-gnu/bin/x86_64-pc-linux-gnu-'
 ```
 
 config the kernel, select all modules for iptables and make modules:
