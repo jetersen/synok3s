@@ -8,43 +8,43 @@ KERNEL_MODULES=(x_tables.ko xt_addrtype.ko xt_comment.ko xt_geoip.ko xt_iprange.
 
 
 start() {
-    # Log execution time
-    date
+  # Log execution time
+  date
 
-    # Make sure packet forwarding is enabled.
-    # 'sysctl -w net.ipv4.ip_forward=1' does not work for me
-    echo 1 > /proc/sys/net/ipv4/ip_forward
+  # Make sure packet forwarding is enabled.
+  # 'sysctl -w net.ipv4.ip_forward=1' does not work for me
+  echo 1 > /proc/sys/net/ipv4/ip_forward
 
-    # Count the number of modules so that we can verify if the module
-    # insertion was successful. We replace whitespaces with newlines
-    # and count lines.
-    MODULE_COUNT=$(
-        echo "${KERNEL_MODULES}" |
-            gawk '{ print gensub(/\s+/, "\n", "g") }' |
-            wc -l
-    )
+  # Count the number of modules so that we can verify if the module
+  # insertion was successful. We replace whitespaces with newlines
+  # and count lines.
+  MODULE_COUNT=$(
+    echo "${KERNEL_MODULES}" |
+    gawk '{ print gensub(/\s+/, "\n", "g") }' |
+    wc -l
+  )
 
-    # Load the kernel modules necessary for K3S
-	for module in ${KERNEL_MODULES[@]}; do
-		/sbin/insmod /lib/modules/$module
-	done
+  # Load the kernel modules necessary for K3S
+  for module in ${KERNEL_MODULES[@]}; do
+    /sbin/insmod /lib/modules/$module
+  done
 
-    # Log current nat table
-    iptables -L -v 
-    iptables -L -v -t nat
+  # Log current nat table
+  iptables -L -v
+  iptables -L -v -t nat
 }
 
 case "$1" in
-        start)
-                start
-                exit
-                ;;
-        stop)
-		exit
-		;;
-        *)
-                # Help message.
-                echo "Usage: $0 start"
-                exit 1
-                ;;
+start)
+  start
+  exit
+  ;;
+stop)
+  exit
+  ;;
+*)
+  # Help message.
+  echo "Usage: $0 start"
+  exit 1
+  ;;
 esac
